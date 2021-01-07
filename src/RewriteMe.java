@@ -54,26 +54,19 @@ public class RewriteMe {
     //Skapa en lista av alla svarsalternativ, där varje svarsalternativ får förekomma
     // en och endast en gång i den lista som du ska returnera
     public List<String> getAllAnswerOptionsDistinct(){
-        List<List<String>> allAnswers = questions.stream().map(Question::getAllAnswers).collect(Collectors.toList());
-        List<String> allAnswersList = new ArrayList<>();
-        allAnswers.forEach(allAnswersList::addAll);
-        allAnswersList = allAnswersList.stream().distinct().collect(Collectors.toList());
-        return allAnswersList;
+        return questions.stream().map(Question::getAllAnswers).flatMap(Collection::stream).distinct().collect(Collectors.toList());
     }
 
 
     //Finns en viss sträng, given som inparameter, som svarsalternativ till någon fråga i vår databas?
     public boolean isThisAnAnswerOption(String answerCandidate){
-        List<String> allAnswers = getAllAnswerOptionsDistinct();
-        return allAnswers.contains(answerCandidate);
+        return questions.stream().map(Question::getAllAnswers).flatMap(Collection::stream).collect(Collectors.toList()).contains(answerCandidate);
     }
 
     //Hur ofta förekommer ett visst svarsalternativ, givet som inparameter, i databasen
     public int getAnswerCandidateFrequncy(String answerCandidate){
         List<List<String>> allAnswers = questions.stream().map(Question::getAllAnswers).collect(Collectors.toList());
-        List<String> allAnswersList = new ArrayList<>();
-        allAnswers.forEach(allAnswersList::addAll);
-        return (int) allAnswersList.stream().filter(s -> s.equals(answerCandidate)).count();
+        return (int) questions.stream().map(Question::getAllAnswers).flatMap(Collection::stream).filter(s -> s.equalsIgnoreCase(answerCandidate)).count();
     }
 
     //Skapa en Map där kategorierna är nycklar och värdena är en lista
@@ -95,14 +88,16 @@ public class RewriteMe {
     // OBS: Du måste använda Reduce!
     public String getLongestLettercountAnwerInAGivenCategory(Category c)
     {
-        List<Question> questionsCategory = questions.stream().filter(q -> q.getCategory().equals(c)).collect(Collectors.toList());
-        List<List<String>> allAnswers = questionsCategory.stream().map(Question::getAllAnswers).collect(Collectors.toList());
-        List<String> allAnswersList = new ArrayList<>();
-        allAnswers.forEach(allAnswersList::addAll);
-        return allAnswersList.stream()
-                .reduce("", (String a, String b) -> {
-                    if (a.length() < b.length()) {a = b;}
-                 return a;});
+        return questions.stream()
+                .filter(q -> q.getCategory().equals(c))
+                .map(Question::getAllAnswers)
+                .flatMap(Collection::stream)
+                .reduce("", (a,b) -> {
+            if (a.length() < b.length()) {
+                a = b;
+            }
+            return a;
+        });
     }
 
 
