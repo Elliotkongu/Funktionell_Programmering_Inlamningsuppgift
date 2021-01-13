@@ -35,7 +35,7 @@ public class RewriteMe {
 
     //Hur många frågor finns i databasen för en viss, given kategori (som ges som inparameter)
     public int getAmountOfQuestionsForACertainCategory(Category category){
-        return (int) questions.stream().filter(q -> q.category.equals(category)).count();
+        return (int) questions.stream().filter(q -> q.getCategory().equals(category)).count();
 
     }
 
@@ -47,7 +47,7 @@ public class RewriteMe {
     //Skapa en lista innehållandes samtliga frågesträngar där frågan tillhör en viss kategori
     //Kategorin ges som inparameter
     public List<String> getAllQuestionStringsBelongingACategory(Category category){
-        return questions.stream().filter(q -> q.category.equals(category)).map(Question::getQuestionString).collect(Collectors.toList());
+        return questions.stream().filter(q -> q.getCategory().equals(category)).map(Question::getQuestionString).collect(Collectors.toList());
 
     }
 
@@ -65,7 +65,6 @@ public class RewriteMe {
 
     //Hur ofta förekommer ett visst svarsalternativ, givet som inparameter, i databasen
     public int getAnswerCandidateFrequncy(String answerCandidate){
-        List<List<String>> allAnswers = questions.stream().map(Question::getAllAnswers).collect(Collectors.toList());
         return (int) questions.stream().map(Question::getAllAnswers).flatMap(Collection::stream).filter(s -> s.equalsIgnoreCase(answerCandidate)).count();
     }
 
